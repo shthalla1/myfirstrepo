@@ -1,0 +1,26 @@
+  user_data = <<EOF
+#!/bin/bash
+
+sudo yum update -y
+
+echo "Install Python and ssm agent"
+sudo yum install python2 -y
+sudo dnf install -y https://s3.us-east-1.amazonaws.com/amazon-ssm-us-east-1/latest/linux_amd64/amazon-ssm-agent.rpm 
+
+echo "Install aws cli"
+sudo curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+sudo yum install zip unzip -y
+sudo unzip awscliv2.zip
+sudo ./aws/install
+
+echo "create new user miduser"
+sudo adduser miduser
+sudo passwd -d miduser
+sudo usermod -aG wheel miduser
+sudo su - miduser
+
+echo "Copy MID binary from s3 to MID"
+aws s3 cp s3://midserver/midserver_zipfile/mid-linux-installer.rome-06-23-2021__patch7-02-09-2022_02-23-2022_0935.linux.x86-64.rpm mid-linux-installer.rome-06-23-2021__patch7-02-09-2022_02-23-2022_0935.linux.x86-64.rpm
+rpm -i mid-linux-installer.rome-06-23-2021__patch7-02-09-2022_02-23-2022_0935.linux.x86-64.rpm
+EOF
+}
